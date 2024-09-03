@@ -22,10 +22,15 @@ local function getScriptNameRecursive(stack: number?)
     end
 end
 
+--[=[
+    @class ProtoServer
+    @server
+]=]
 local ProtoServer = {
     RemoteEventMarker = REMOTE_EVENT_MARKER,
     RemoteFunctionMarker = REMOTE_FUNCTION_MARKER,
 }
+
 function ProtoServer.CreateService(serviceProps: ServiceProps): {any}
     if not serviceProps.Name or #serviceProps.Name <= 0 then
         serviceProps.Name = getScriptNameRecursive()
@@ -47,7 +52,7 @@ function ProtoServer.GetService(serviceName: string): {any}
     return assert(ProtoServices[serviceName], `Could not find controller "{ serviceName }"`)
 end
 
-function ProtoServer.AddServices(folder: Folder, deep: boolean?)
+function ProtoServer.LoadDependencies(folder: Folder, deep: boolean?)
     local loaded = {}
     local function bulkImport(folder_: Folder)
         for _, moduleOrFolder in ipairs(folder_:GetChildren()) do

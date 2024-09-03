@@ -1,0 +1,10 @@
+title = "Proto"
+
+[[classOrder]]
+section = "The backbone of Proto"
+collapsed = false
+classes = ["Proto", "ProtoClient", "ProtoServer"]
+
+[[classOrder]]
+section = "Packages"
+classes = ["Signal", "Promise"]

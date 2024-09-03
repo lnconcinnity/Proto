@@ -1,6 +1,4 @@
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-
-local Class = require(ReplicatedStorage.Shared.Proto.util.Class)
+local Class = require(script.Parent.Parent.util.Class)
 local ActorManager = require(script.Parent.Parent.util.ActorManager)
 local Signal = require(script.Parent.Parent.Packages.Signal)
 

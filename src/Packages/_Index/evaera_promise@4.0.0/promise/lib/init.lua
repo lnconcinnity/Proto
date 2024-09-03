@@ -48,6 +48,7 @@ end
 	an instance of this object.
 
 	@class Error
+	@ignore Error
 ]=]
 local Error
 do

@@ -23,7 +23,26 @@ local function getScriptNameRecursive(stack: number?)
     end
 end
 
+--[=[
+    @class ProtoClient
+    @client
+
+    A container for client-sided interactions of Proto. Main runtime functions are found here.
+]=]
 local ProtoClient = {}
+
+--[=[
+    @within ProtoClient
+    @function GetService
+    
+    Used to retrieve the `NetworkBridge` between a `ProtoService` and a `ProtoController`.
+    @param serviceName string
+    @return ProtoNetwork
+
+    :::caution
+    Please be sure that the service being retrieved exists and has the `HasNetworkModel` set to true!
+    :::
+]=]
 function ProtoClient.GetService(serviceName: string)
     local bridge = ProtoServices[serviceName]
     if not bridge then
@@ -33,6 +52,13 @@ function ProtoClient.GetService(serviceName: string)
     return bridge
 end
 
+--[=[
+    Instantiate a new `ProtoController`.
+    @within ProtoClient
+    @function CreateController
+    @param controllerProps {Name: string}
+    @return ProtoController
+]=]
 function ProtoClient.CreateController(controllerProps: ControllerProps): {any}
     if not controllerProps.Name or #controllerProps.Name <= 0 then
         controllerProps.Name = getScriptNameRecursive()
@@ -43,17 +69,42 @@ function ProtoClient.CreateController(controllerProps: ControllerProps): {any}
     return object
 end
 
+--[=[
+    Fetch a cloned version of a `ParallelObject` so that template functions can be overriden.
+    @within ProtoClient
+    @function GetParallelFactory
+    @return ParallelObject
+]=]
 function ProtoClient.GetParallelFactory()
     return table.clone(ParallelObject)
 end
 
+--[=[
+    Retrieve `controller` from other sources.
+    :::warning
+    You cannot use retrieve a controller if `Proto.Start()` hasn't been called yet, doing so will result in an error!
+    :::
+    @within ProtoClient
+    @function GetController
+    @param controllerName string
+    @return ProtoController
+]=]
 function ProtoClient.GetController(controllerName: string): ProtoController
     assert(HasProtoStarted, "Proto has not started yet!")
     assert(#controllerName > 0, "Argument 1 must be a non-empty string!")
     return assert(ProtoControllers[controllerName], `Could not find controller "{ controllerName }"`)
 end
 
-function ProtoClient.AddControllers(folder: Folder, deep: boolean?)
+--[=[
+    Loads dependencies under a folder.
+    :::caution
+    If a dependency errored during this process, it will prevent from any proceeding dependencies from being loaded!
+    :::
+    @within ProtoClient
+    @function LoadDependencies
+    @return {any}
+]=]
+function ProtoClient.LoadDependencies(folder: Folder, deep: boolean?)
     local loaded = {}
     local function bulkImport(folder_: Folder)
         for _, moduleOrFolder in ipairs(folder_:GetChildren()) do
@@ -68,6 +119,14 @@ function ProtoClient.AddControllers(folder: Folder, deep: boolean?)
     return loaded
 end
 
+--[=[
+    Start up the process.
+    :::info
+    If a controller failed to load, don't worry, it won't stop the thread! However, if you have a controller that depends on the controller in detail, it'll more likely fail too!
+    :::
+    @within ProtoClient
+    @function Start
+]=]
 function ProtoClient.Start()
     if HasProtoStarted then
         error("Proto has already started!", 2)
@@ -106,6 +165,12 @@ function ProtoClient.Start()
     end)
 end
 
+--[=[
+    A helper function used to wait for Proto to start. Best used by external scripts.
+    @within ProtoClient
+    @function OnStarted
+    @return Promise
+]=]
 function ProtoClient.OnStarted()
     if HasProtoStarted then
         return Promise.resolve()

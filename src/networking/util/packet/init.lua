@@ -859,7 +859,7 @@ RunService.Heartbeat:Connect(function(_dt)
             for _id, threadInfo in pairs(queue.runningInvokeThreads) do
                 local lifetime = threadInfo.lifetime
                 if lifetime <= 0 then
-                    task.spawn(threadInfo.thread) -- we dont want our thread to wait infinitely
+                    task.spawn(threadInfo.thread, false, `This thread has already expired, request is dropped.`)
                     queue.runningInvokeThreads[_id] = nil
                 else
                     threadInfo.lifetime = lifetime - _dt
@@ -879,6 +879,7 @@ RunService.Heartbeat:Connect(function(_dt)
         for _id, threadInfo in pairs(PacketQueue.runningInvokeThreads) do
             local lifetime = threadInfo.lifetime
             if lifetime <= 0 then
+                task.spawn(threadInfo.thread, false, `This thread has already expired, request is dropped.`)
                 PacketQueue.runningInvokeThreads[_id] = nil
             else
                 threadInfo.lifetime = lifetime - _dt
